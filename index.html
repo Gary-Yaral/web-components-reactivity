@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="counter.css">
+    <title>Document</title>
+</head>
+
+<body>
+  <div class="box">
+  <app-element>
+    <style>
+      :host {
+        display: inline-block;
+        padding: 6px 20px;
+        background: steelblue;
+        color: white;
+      }
+    </style>
+  </app-element>
+  </div>
+  <script>
+    customElements.define("app-element", class extends HTMLElement {
+      constructor() {
+        super();
+        this.counter = 0
+        this.attachShadow({ mode: "open" });
+      }
+  
+      connectedCallback() {
+        this.shadowRoot.innerHTML = `<style>
+          :host {
+            width: 6rem;
+            display: flex;
+            background: steelblue;
+            color: white;
+          }
+
+          label {
+            min-width: 2rem;
+            min-height: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+          }
+
+          button {
+            min-width: 2rem;
+            min-height: 2rem;
+          }
+        </style>   
+          `
+        // Create plus button
+        this.btnPlus = document.createElement('button')
+        this.btnPlus.innerHTML = "+"
+        this.btnPlus.classList.add("btnPlus")
+        this.onIncrement = this.increment.bind(this)
+        this.btnPlus.addEventListener("click", this.onIncrement)
+        // Create counter label
+        this.counterLabel = document.createElement('label')
+        this.counterLabel.innerHTML = this.counter
+        this.onRefresh = this.refresh.bind(this)
+        this.counterLabel.addEventListener("refresh", this.onRefresh)
+        // Create sub button
+        this.btnMinus = document.createElement('button')
+        this.btnMinus.innerHTML = "-"
+        this.btnMinus.classList.add("btnPlus")
+        this.onDecrement= this.decrement.bind(this)
+        this.btnMinus.addEventListener("click", this.onDecrement)
+        // Add elements to shadowRoot
+        this.shadowRoot.appendChild(this.btnPlus);
+        this.shadowRoot.appendChild(this.counterLabel);
+        this.shadowRoot.appendChild(this.btnMinus);
+      }
+
+      increment() {
+        this.counter++
+        this.counterLabel.dispatchEvent(new CustomEvent("refresh", {detail: {
+          counter: this.counter
+        }}))
+      }
+
+      decrement() {
+        if(this.counter > 0) {
+          this.counter--
+          this.counterLabel.dispatchEvent(new CustomEvent("refresh", {detail: {
+            counter: this.counter
+          }}))
+        }
+      }
+
+      refresh(event) {
+        event.target.innerHTML = event.detail.counter
+      }
+    });
+  </script>
+
+  </script>
+
+</body>
+</html>
